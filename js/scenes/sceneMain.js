@@ -25,6 +25,7 @@ class SceneMain extends Phaser.Scene {
 		this.load.image("cat_run8", "images/characters/cat/Run_8.png");
 		// ground
 		this.load.image("ground", "images/ground.png");
+		this.load.image("ground2", "images/ground-2.png");
 	}
 	create() {
 		this.power=0;
@@ -64,11 +65,14 @@ class SceneMain extends Phaser.Scene {
 		});
 
 		this.ground=this.physics.add.sprite(240, 600, "ground");
+		this.ground2=this.physics.add.sprite(240, 300, "ground2");
 		this.ground.setImmovable();
+		this.ground2.setImmovable();
 		this.catIdle();
 		this.catCharacter.setGravityY(200);
 		this.catCharacter.setVelocityY(100);
 		this.physics.add.collider(this.catCharacter, this.ground);
+		this.physics.add.collider(this.catCharacter, this.ground2);
 		
 		var keyObj = this.input.keyboard.addKey('W');
 
