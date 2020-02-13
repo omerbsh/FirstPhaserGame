@@ -29,6 +29,9 @@ class SceneMain extends Phaser.Scene {
 	}
 	create() {
 		this.power=0;
+		this.CAT_IDLE = 0;
+		this.CAT_RUNNING = 1;
+		this.catMode = -1;
 		this.anims.create({
 			key: 'catIdle',
 			frames: [
@@ -89,16 +92,23 @@ class SceneMain extends Phaser.Scene {
 				this.catCharacter.flipX=true;
 			}
 			this.catCharacter.x-=2;
+			this.catMode=this.CAT_RUNNING;
 		}
 		else if ( key_right.isDown ) {
 			if( this.catCharacter.flipX == true ) {
 				this.catCharacter.flipX=false;
 			}
 			this.catCharacter.x+=2;
+			this.catMode=this.CAT_RUNNING;
 		}
 		else {
 			console.log('cat idle');
-			this.catCharacter.setTexture('cat_idle_1');
+			if(this.catMode!=this.CAT_IDLE)
+			{
+				this.catCharacter.anims.play('catIdle');
+				this.catMode=this.CAT_IDLE
+			}
+			
 		}
 		// console.log( this.catCharacter.body.onFloor() );
 		if( this.catCharacter.body.onFloor() ) {
