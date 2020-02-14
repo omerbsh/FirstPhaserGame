@@ -92,21 +92,26 @@ class SceneMain extends Phaser.Scene {
 				this.catCharacter.flipX=true;
 			}
 			this.catCharacter.x-=2;
-			this.catMode=this.CAT_RUNNING;
+			if(this.catMode==this.CAT_IDLE) {
+				this.catMode=this.CAT_RUNNING;
+				this.catCharacter.anims.play('catRun');
+			}
 		}
 		else if ( key_right.isDown ) {
 			if( this.catCharacter.flipX == true ) {
 				this.catCharacter.flipX=false;
 			}
 			this.catCharacter.x+=2;
-			this.catMode=this.CAT_RUNNING;
+			if(this.catMode==this.CAT_IDLE) {
+				this.catMode=this.CAT_RUNNING;
+				this.catCharacter.anims.play('catRun');
+			}
 		}
 		else {
-			console.log('cat idle');
 			if(this.catMode!=this.CAT_IDLE)
 			{
 				this.catCharacter.anims.play('catIdle');
-				this.catMode=this.CAT_IDLE
+				this.catMode=this.CAT_IDLE;
 			}
 			
 		}
