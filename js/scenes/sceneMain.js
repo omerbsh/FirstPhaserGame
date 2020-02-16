@@ -2,6 +2,9 @@ class SceneMain extends Phaser.Scene {
 	constructor() {
 		super('SceneMain');
 	}
+
+	
+
 	preload() {
 		// idle cat
 		this.load.image("cat_idle_1", "images/characters/cat/Idle_1.png");
@@ -26,12 +29,63 @@ class SceneMain extends Phaser.Scene {
 		// ground
 		this.load.image("ground", "images/ground.png");
 		this.load.image("ground2", "images/ground-2.png");
+		this.load.image("bullet", "images/bullet.png"); //Shooting
 	}
 	create() {
-		this.power=0;
+
+		var Bullet = new Phaser.Class({
+
+			Extends: Phaser.GameObjects.Image,
+		
+			initialize:
+		
+			// Bullet Constructor
+			function Bullet (scene)
+			{
+				Phaser.GameObjects.Image.call(this, scene, 0, 0, 'bullet');
+				this.speed = 1;
+				this.born = 0;
+				this.direction = 0;
+				this.xSpeed = 0;
+				this.ySpeed = 0;
+				this.setSize(12, 12, true);
+			},
+		
+			// Fires a bullet from the player to the reticle
+			fire: function (shooter, isLeft)
+			{
+				this.setPosition(shooter.x, shooter.y); // Initial position
+		
+					if(isLeft) this.xSpeed = -this.speed;
+					else this.xSpeed = this.speed;
+				
+				this.born = 0; // Time since new bullet spawned
+			},
+		
+			// Updates the position of the bullet each cycle
+			update: function (time, delta)
+			{
+				this.x += this.xSpeed * delta;
+				this.y += this.ySpeed * delta;
+				this.born += delta;
+				if (this.born > 1000)
+				{
+					this.setActive(false);
+					this.setVisible(false);
+				}
+			}
+		
+		});
+
+		this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true, maxSize: 1 }); //Shooting
+		this.power = 0;
 		this.CAT_IDLE = 0;
 		this.CAT_RUNNING = 1;
 		this.catMode = -1;
+		this.key_right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+		this.key_left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+		this.key_up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+		this.key_space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE); //Shooting button
 		this.anims.create({
 			key: 'catIdle',
 			frames: [
@@ -53,22 +107,22 @@ class SceneMain extends Phaser.Scene {
 		this.anims.create({
 			key: 'catRun',
 			frames:
-			[
-				{ key: 'cat_run1' },
-				{ key: 'cat_run2' },
-				{ key: 'cat_run3' },
-				{ key: 'cat_run4' },
-				{ key: 'cat_run5' },
-				{ key: 'cat_run6' },
-				{ key: 'cat_run7' },
-				{ key: 'cat_run8' },
-			],
+				[
+					{ key: 'cat_run1' },
+					{ key: 'cat_run2' },
+					{ key: 'cat_run3' },
+					{ key: 'cat_run4' },
+					{ key: 'cat_run5' },
+					{ key: 'cat_run6' },
+					{ key: 'cat_run7' },
+					{ key: 'cat_run8' },
+				],
 			frameRate: 12,
 			repeat: -1
 		});
 
-		this.ground=this.physics.add.sprite(240, 600, "ground");
-		this.ground2=this.physics.add.sprite(240, 300, "ground2");
+		this.ground = this.physics.add.sprite(240, 600, "ground");
+		this.ground2 = this.physics.add.sprite(240, 300, "ground2");
 		this.ground.setImmovable();
 		this.ground2.setImmovable();
 		this.catIdle();
@@ -76,70 +130,93 @@ class SceneMain extends Phaser.Scene {
 		this.catCharacter.setVelocityY(100);
 		this.physics.add.collider(this.catCharacter, this.ground);
 		this.physics.add.collider(this.catCharacter, this.ground2);
-		
+
 		var keyObj = this.input.keyboard.addKey('W');
 
 		keyObj.on('down', this.startJump, this);
 		keyObj.on('up', this.endJump, this);
+
+		//this.bullets.setAll('checkWorldBounds', true);
+		//this.bullets.setAll('outOfBoundsKill', true);
+		//End Shooting
 	}
 	update() {
-		var key_right=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-		var key_left=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-		var key_up=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
-		if ( key_left.isDown ) {
-			if( this.catCharacter.flipX == false ) {
-				this.catCharacter.flipX=true;
+
+		if (this.key_space.isDown) {
+			var bullet = this.playerBullets.get()
+
+        if (bullet)
+        {
+			bullet.setActive(true).setVisible(true);
+			bullet.fire(this.catCharacter, this.catCharacter.flipX);
+			//this.physics.add.collider(enemy, bullet, enemyHitCallback); //Add once there are enemies
+        }
+		}
+
+		if (this.key_left.isDown) {
+			if (this.catCharacter.flipX == false) {
+				this.catCharacter.flipX = true;
 			}
-			this.catCharacter.x-=2;
-			if(this.catMode==this.CAT_IDLE) {
-				this.catMode=this.CAT_RUNNING;
+			this.catCharacter.x -= 2;
+			if (this.catMode == this.CAT_IDLE) {
+				this.catMode = this.CAT_RUNNING;
 				this.catCharacter.anims.play('catRun');
 			}
 		}
-		else if ( key_right.isDown ) {
-			if( this.catCharacter.flipX == true ) {
-				this.catCharacter.flipX=false;
+		else if (this.key_right.isDown) {
+			if (this.catCharacter.flipX == true) {
+				this.catCharacter.flipX = false;
 			}
-			this.catCharacter.x+=2;
-			if(this.catMode==this.CAT_IDLE) {
-				this.catMode=this.CAT_RUNNING;
+			this.catCharacter.x += 2;
+			if (this.catMode == this.CAT_IDLE) {
+				this.catMode = this.CAT_RUNNING;
 				this.catCharacter.anims.play('catRun');
 			}
 		}
 		else {
-			if(this.catMode!=this.CAT_IDLE)
-			{
+			if (this.catMode != this.CAT_IDLE) {
 				this.catCharacter.anims.play('catIdle');
-				this.catMode=this.CAT_IDLE;
+				this.catMode = this.CAT_IDLE;
 			}
-			
+
 		}
 		// console.log( this.catCharacter.body.onFloor() );
-		if( this.catCharacter.body.onFloor() ) {
+		if (this.catCharacter.body.onFloor()) {
 			console.log('cat on ground');
 		}
 	}
+
+enemyHitCallback(enemyHit, bulletHit)
+{
+    
+    if (bulletHit.active === true && enemyHit.active === true)
+    {
+        enemyHit.setActive(false).setVisible(false);
+        bulletHit.setActive(false).setVisible(false);
+    }
+}
+
 	endJump() {
 		console.log('endjump');
 		this.timer.remove();
 		this.catCharacter.setVelocityY(-350);
-		this.power=0;
+		this.power = 0;
 	}
 	startJump() {
 		console.log('startjump');
-		this.timer=this.time.addEvent({ delay: 100, callback: this.tick, callbackScope: this, loop: true });
+		this.timer = this.time.addEvent({ delay: 100, callback: this.tick, callbackScope: this, loop: true });
 		// this.catCharacter.setVelocityY(-100);
 	}
 	tick() {
-		if (this.power<5) {
-			this.power+=.3;
+		if (this.power < 5) {
+			this.power += .3;
 		}
 	}
 	catIdle() {
-		this.catCharacter=this.physics.add.sprite(100,100, 'cat_idle_1');
-		this.catCharacter.displayWidth=150;
-		this.catCharacter.displayHeight=150;
+		this.catCharacter = this.physics.add.sprite(100, 100, 'cat_idle_1');
+		this.catCharacter.displayWidth = 150;
+		this.catCharacter.displayHeight = 150;
 		this.catCharacter.play('catRun');
 	}
 	catMove() {
