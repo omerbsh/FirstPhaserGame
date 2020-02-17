@@ -5,7 +5,7 @@ class SceneMain extends Phaser.Scene {
 		super('SceneMain');
 	}
 
-	
+
 
 	preload() {
 		// idle cat
@@ -38,45 +38,41 @@ class SceneMain extends Phaser.Scene {
 		var Bullet = new Phaser.Class({
 
 			Extends: Phaser.GameObjects.Image,
-		
+
 			initialize:
-		
-			// Bullet Constructor
-			function Bullet (scene)
-			{
-				Phaser.GameObjects.Image.call(this, scene, 0, 0, 'bullet');
-				this.speed = 1;
-				this.born = 0;
-				this.direction = 0;
-				this.xSpeed = 0;
-				this.ySpeed = 0;
-				this.setSize(12, 12, true);
-			},
-		
+
+				// Bullet Constructor
+				function Bullet(scene) {
+					Phaser.GameObjects.Image.call(this, scene, 0, 0, 'bullet');
+					this.speed = 1;
+					this.born = 0;
+					this.direction = 0;
+					this.xSpeed = 0;
+					this.ySpeed = 0;
+					this.setSize(12, 12, true);
+				},
+
 			// Fires a bullet from the player to the reticle
-			fire: function (shooter, isLeft)
-			{
+			fire: function (shooter, isLeft) {
 				this.setPosition(shooter.x, shooter.y); // Initial position
-		
-					if(isLeft) this.xSpeed = -this.speed;
-					else this.xSpeed = this.speed;
-				
+
+				if (isLeft) this.xSpeed = -this.speed;
+				else this.xSpeed = this.speed;
+
 				this.born = 0; // Time since new bullet spawned
 			},
-		
+
 			// Updates the position of the bullet each cycle
-			update: function (time, delta)
-			{
+			update: function (time, delta) {
 				this.x += this.xSpeed * delta;
 				this.y += this.ySpeed * delta;
 				this.born += delta;
-				if (this.born > 1000)
-				{
+				if (this.born > 1000) {
 					this.setActive(false);
 					this.setVisible(false);
 				}
 			}
-		
+
 		});
 
 		this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true, maxSize: 1 }); //Shooting
@@ -148,12 +144,11 @@ class SceneMain extends Phaser.Scene {
 		if (this.key_space.isDown) {
 			var bullet = this.playerBullets.get()
 
-        if (bullet)
-        {
-			bullet.setActive(true).setVisible(true);
-			bullet.fire(this.catCharacter, this.catCharacter.flipX);
-			//this.physics.add.collider(enemy, bullet, enemyHitCallback); //Add once there are enemies
-        }
+			if (bullet) {
+				bullet.setActive(true).setVisible(true);
+				bullet.fire(this.catCharacter, this.catCharacter.flipX);
+				//this.physics.add.collider(enemy, bullet, enemyHitCallback); //Add once there are enemies
+			}
 		}
 
 		if (this.key_left.isDown) {
@@ -189,15 +184,13 @@ class SceneMain extends Phaser.Scene {
 		}
 	}
 
-enemyHitCallback(enemyHit, bulletHit)
-{
-    
-    if (bulletHit.active === true && enemyHit.active === true)
-    {
-        enemyHit.setActive(false).setVisible(false);
-        bulletHit.setActive(false).setVisible(false);
-    }
-}
+	enemyHitCallback(enemyHit, bulletHit) {
+
+		if (bulletHit.active === true && enemyHit.active === true) {
+			enemyHit.setActive(false).setVisible(false);
+			bulletHit.setActive(false).setVisible(false);
+		}
+	}
 
 	endJump() {
 		console.log('endjump');
