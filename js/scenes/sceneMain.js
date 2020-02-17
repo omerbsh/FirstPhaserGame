@@ -126,6 +126,7 @@ class SceneMain extends Phaser.Scene {
 		this.catIdle();
 		this.catCharacter.setGravityY(200);
 		this.catCharacter.setVelocityY(100);
+		
 		this.physics.add.collider(this.catCharacter, this.ground);
 		this.physics.add.collider(this.catCharacter, this.ground2);
 
@@ -210,9 +211,8 @@ class SceneMain extends Phaser.Scene {
 	}
 	catIdle() {
 		this.catCharacter = this.physics.add.sprite(100, 100, 'cat_idle_1');
-		this.catCharacter.displayWidth = 150;
-		this.catCharacter.displayHeight = 150;
-		this.catCharacter.play('catRun');
+		this.catCharacter.setSize(200, 450, true);
+		this.catCharacter.scaleX = this.catCharacter.scaleY = 0.3
 	}
 	catMove() {
 		//this.catCharacter.loadTexture('catRun');

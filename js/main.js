@@ -19,7 +19,7 @@ window.onload=function() {
 			physics: {
 				default: 'arcade',
 				arcade: {
-					//debug: true // change if you need
+					debug: true // change if you need
 				}
 			},
 			scene: [SceneMain]
