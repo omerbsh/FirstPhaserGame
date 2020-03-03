@@ -7,6 +7,8 @@ class SceneMain extends Phaser.Scene {
 
 
 
+
+
 	preload() {
 		// idle cat
 		this.load.image("cat_idle_1", "images/characters/cat/Idle_1.png");
@@ -32,6 +34,7 @@ class SceneMain extends Phaser.Scene {
 		this.load.image("ground", "images/ground.png");
 		this.load.image("ground2", "images/ground-2.png");
 		this.load.image("bullet", "images/bullet.png"); //Shooting
+		this.load.image("enemy", "images/parrot.png"); //Shooting
 	}
 	create() {
 
@@ -75,7 +78,59 @@ class SceneMain extends Phaser.Scene {
 
 		});
 
+		var Enemy = new Phaser.Class({
+
+			
+
+			Extends: Phaser.Physics.Arcade.Sprite,
+
+			initialize:
+			function Enemy(scene) {
+				this.directionLeft = true;
+				Phaser.Physics.Arcade.Sprite.call(this, scene, 400, 300, 'enemy');
+				
+				scene.physics.add.collider(this, scene.ground);
+				scene.physics.add.collider(this, scene.ground2);
+				this.setScale(0.3)
+				scene.physics.world.enable(this);
+				this.setGravityY(200);
+				this.setVelocityY(100);
+				console.log(this.body);
+				console.log(this);
+				this.setSize(this.width,this.height,true);
+				this.scene = this;
+			},
+
+
+			update: function(time,delta)
+			{
+				if(this.directionLeft) 
+				{
+					this.x-=1;
+				}
+				else
+				{
+					this.x+=1;
+				}				
+
+				if((!this.body.touching.down)&&(this.body.wasTouching.down))
+				{
+					this.x = this.previousX;
+					this.y = this.previousY;
+					this.directionLeft = !this.directionLeft;
+				}
+				else
+				{
+					this.previousX = this.x;
+					this.previousY = this.y;
+				}
+
+				//console.log(this.body.touching)
+			}
+		});
+
 		this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true, maxSize: 1 }); //Shooting
+		this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true, maxSize: 1 }); //Enemies
 		this.power = 0;
 		this.CAT_IDLE = 0;
 		this.CAT_RUNNING = 1;
@@ -126,7 +181,9 @@ class SceneMain extends Phaser.Scene {
 		this.catIdle();
 		this.catCharacter.setGravityY(200);
 		this.catCharacter.setVelocityY(100);
-		
+		this.enemyCharacter = this.enemies.get();
+		this.enemyCharacter.setGravityY(200);
+		this.enemyCharacter.setVelocityY(100);
 		this.physics.add.collider(this.catCharacter, this.ground);
 		this.physics.add.collider(this.catCharacter, this.ground2);
 
@@ -217,4 +274,6 @@ class SceneMain extends Phaser.Scene {
 	catMove() {
 		//this.catCharacter.loadTexture('catRun');
 	}
+
+
 }
