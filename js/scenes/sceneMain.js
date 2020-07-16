@@ -205,7 +205,7 @@ class SceneMain extends Phaser.Scene {
 			if (bullet) {
 				bullet.setActive(true).setVisible(true);
 				bullet.fire(this.catCharacter, this.catCharacter.flipX);
-				//this.physics.add.collider(enemy, bullet, enemyHitCallback); //Add once there are enemies
+				this.physics.add.collider(this.enemyCharacter, bullet, this.enemyHitCallback); //Add once there are enemies
 			}
 		}
 
