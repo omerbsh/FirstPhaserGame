@@ -251,14 +251,21 @@ class SceneMain extends Phaser.Scene {
 	}
 
 	endJump() {
+		if(this.catCharacter.body.velocity.y==0)
+		{
 		console.log('endjump');
 		this.timer.remove();
 		this.catCharacter.setVelocityY(-350);
 		this.power = 0;
+		}
 	}
 	startJump() {
 		console.log('startjump');
-		this.timer = this.time.addEvent({ delay: 100, callback: this.tick, callbackScope: this, loop: true });
+		if(this.catCharacter.body.velocity.y==0)
+		{
+			this.timer = this.time.addEvent({ delay: 100, callback: this.tick, callbackScope: this, loop: true });
+		}
+		
 		// this.catCharacter.setVelocityY(-100);
 	}
 	tick() {
